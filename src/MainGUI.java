@@ -84,7 +84,7 @@ public class MainGUI extends javax.swing.JFrame {
         btn_save = new javax.swing.JButton();
         slider_blend = new javax.swing.JSlider();
         jLabel10 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btn_record = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -224,11 +224,11 @@ public class MainGUI extends javax.swing.JFrame {
             }
         });
 
-        jLabel7.setText("pi");
+        jLabel7.setText("π");
 
         jLabel8.setText("0");
 
-        jLabel9.setText("-pi");
+        jLabel9.setText("-π");
 
         javax.swing.GroupLayout phasePanelLayout = new javax.swing.GroupLayout(phasePanel);
         phasePanel.setLayout(phasePanelLayout);
@@ -245,7 +245,7 @@ public class MainGUI extends javax.swing.JFrame {
                     .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(phasePaintCanvas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btn_phaseClear)
                 .addContainerGap())
         );
@@ -357,10 +357,10 @@ public class MainGUI extends javax.swing.JFrame {
 
         jLabel10.setText("Blend: ");
 
-        jButton1.setText("jButton1");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btn_record.setText("Record and Analyze");
+        btn_record.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btn_recordActionPerformed(evt);
             }
         });
 
@@ -383,10 +383,9 @@ public class MainGUI extends javax.swing.JFrame {
                         .addGap(4, 4, 4)
                         .addComponent(slider_blend, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton1)
-                            .addComponent(btn_load, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addComponent(btn_load, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(btn_record, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(phasePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -404,8 +403,8 @@ public class MainGUI extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btn_load)
                             .addComponent(btn_save))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_record)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -442,11 +441,16 @@ public class MainGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_slider_voiceFreqStateChanged
 
     private void btn_playActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_playActionPerformed
-        if (soundThread != null)
-            soundThread.exit();
-        soundThread = new SoundThread();
+        
         if (btn_play.isSelected())
+        {
+            soundThread = new SoundThread();
             soundThread.start();
+        }
+        else
+        {
+            soundThread.exit();
+        }
     }//GEN-LAST:event_btn_playActionPerformed
 
     private void btn_freqClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_freqClearActionPerformed
@@ -472,12 +476,6 @@ public class MainGUI extends javax.swing.JFrame {
             generateFreqLine(Double.parseDouble(txt_voiceFreq.getText()), Integer.parseInt(txt_maxFreq.getText()));
         }
     }//GEN-LAST:event_slider_freqStateChanged
-
-    private void btn_phaseClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_phaseClearActionPerformed
-        phasePaintCanvas.clear();
-        phasePaintCanvas.recalc();
-        requestUpdateWaveform();
-    }//GEN-LAST:event_btn_phaseClearActionPerformed
 
     private void btn_loadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_loadActionPerformed
         int returnVal = fc.showOpenDialog(MainGUI.this);
@@ -587,16 +585,17 @@ public class MainGUI extends javax.swing.JFrame {
         phasePaintCanvas.blend(slider_blend.getValue() / 100.0);
     }//GEN-LAST:event_slider_blendStateChanged
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        RecordFrame recordFrame = null;
-        try {
-            recordFrame = new RecordFrame();
-        } catch (LineUnavailableException ex) {
-            Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    private void btn_recordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_recordActionPerformed
+        RecordFrame recordFrame = new RecordFrame();
         recordFrame.setVisible(true);
         recordFrame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btn_recordActionPerformed
+
+    private void btn_phaseClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_phaseClearActionPerformed
+        phasePaintCanvas.clear();
+        phasePaintCanvas.recalc();
+        requestUpdateWaveform();
+    }//GEN-LAST:event_btn_phaseClearActionPerformed
     
     public void requestUpdateWaveform()
     {
@@ -793,10 +792,10 @@ public class MainGUI extends javax.swing.JFrame {
     private javax.swing.JButton btn_load;
     private javax.swing.JButton btn_phaseClear;
     private javax.swing.JToggleButton btn_play;
+    private javax.swing.JButton btn_record;
     private javax.swing.JButton btn_save;
     private PaintCanvas freqPaintCanvas;
     private javax.swing.JPanel freqPanel;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;

@@ -20,54 +20,15 @@ import javax.sound.sampled.TargetDataLine;
  * @author dsun18
  */
 public class RecordFrame extends javax.swing.JFrame {
-
+    
+    private RecordThread recordThread;
+    private ByteArrayOutputStream out;
     /**
      * Creates new form RecordFrame
      */
-    public RecordFrame() throws LineUnavailableException {
+    public RecordFrame() {
         initComponents();
         
-        TargetDataLine line = null;
-        AudioFormat format = new AudioFormat(44100, 16, 1, true, true);
-        DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
-        if (!AudioSystem.isLineSupported(info)) {
-            // Handle the error ... 
-        }
-        // Obtain and open the line.
-        try {
-            line = (TargetDataLine) AudioSystem.getLine(info);
-            line.open(format);
-        } catch (LineUnavailableException ex) {
-            // Handle the error ... 
-        }
-        ByteArrayOutputStream out  = new ByteArrayOutputStream();
-        int numBytesRead;
-        byte[] data = new byte[line.getBufferSize() / 5];
-
-        // Begin audio capture.
-        line.start();
-        int counter = 0;
-        // Here, stopped is a global boolean set by another thread.
-        while (counter < 20) {
-            System.out.println(counter);
-           // Read the next chunk of data from the TargetDataLine.
-           numBytesRead =  line.read(data, 0, data.length);
-           // Save this chunk of data.
-           out.write(data, 0, numBytesRead);
-           counter++;
-        }
-        line.close();
-        
-        info = new DataLine.Info(SourceDataLine.class, format);
-
-
-        SourceDataLine line2 = (SourceDataLine) AudioSystem.getLine(info);
-        line2.open(format);
-        line2.start();
-        
-        line2.write(out.toByteArray(), 0, 20*data.length);
-        line2.drain();
-        line2.close();
     }
 
     /**
@@ -79,21 +40,50 @@ public class RecordFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        btn_record = new javax.swing.JToggleButton();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        btn_record.setText("Record");
+        btn_record.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_recordActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btn_record)
+                .addContainerGap(646, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(332, Short.MAX_VALUE)
+                .addComponent(btn_record)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btn_recordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_recordActionPerformed
+        if (btn_record.isSelected())
+        {
+            btn_record.setText("Stop");
+            recordThread = new RecordThread();
+            recordThread.start();
+        }
+        else
+        {
+            btn_record.setText("Record");
+            recordThread.exit();
+        }
+    }//GEN-LAST:event_btn_recordActionPerformed
 
     /**
      * @param args the command line arguments
@@ -125,15 +115,77 @@ public class RecordFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                try {
-                    new RecordFrame().setVisible(true);
-                } catch (LineUnavailableException ex) {
-                    Logger.getLogger(RecordFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                new RecordFrame().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JToggleButton btn_record;
     // End of variables declaration//GEN-END:variables
+
+    class RecordThread extends Thread
+    {
+        private boolean bExitThread = true;
+        
+        public void run()
+        {
+            TargetDataLine line = null;
+            AudioFormat format = new AudioFormat(44100, 16, 1, true, true);
+            DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+            if (!AudioSystem.isLineSupported(info)) {
+                return;
+            }
+            // Obtain and open the line.
+            try {
+                line = (TargetDataLine) AudioSystem.getLine(info);
+                line.open(format);
+            } catch (LineUnavailableException ex) {
+                return;
+            }
+            out  = new ByteArrayOutputStream();
+            int numBytesRead;
+            byte[] data = new byte[line.getBufferSize() / 5];
+
+            System.out.println("Line started");
+            System.out.println("Buffer size: " + data.length);
+            
+            // Begin audio capture.
+            line.start();
+            // Here, stopped is a global boolean set by another thread.
+            while (!bExitThread) {
+               // Read the next chunk of data from the TargetDataLine.
+               numBytesRead =  line.read(data, 0, data.length);
+                System.out.println("numBytesRead");
+               // Save this chunk of data.
+               out.write(data, 0, numBytesRead);
+            }
+            line.close();
+            
+            
+            info = new DataLine.Info(SourceDataLine.class, format);
+            SourceDataLine line2 = null;
+            try {
+                line2 = (SourceDataLine) AudioSystem.getLine(info);
+            } catch (LineUnavailableException ex) {
+                Logger.getLogger(RecordFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                line2.open(format);
+            } catch (LineUnavailableException ex) {
+                Logger.getLogger(RecordFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            line2.start();
+            line2.write(out.toByteArray(), 0, 20*data.length);
+            line2.drain();
+            line2.close();
+                    
+        }
+        
+        public void exit()
+        {
+            bExitThread = true;
+        }
+    }
+
 }
