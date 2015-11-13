@@ -1,5 +1,7 @@
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
@@ -8,6 +10,7 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.TargetDataLine;
+import java.util.ArrayList;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -22,13 +25,14 @@ import javax.sound.sampled.TargetDataLine;
 public class RecordFrame extends javax.swing.JFrame {
     
     private RecordThread recordThread;
+    private UpdateWaveformThread wavUptThread;
     private ByteArrayOutputStream out;
     /**
      * Creates new form RecordFrame
      */
     public RecordFrame() {
         initComponents();
-        
+        recordCanvas.setParent(this);
     }
 
     /**
@@ -41,8 +45,10 @@ public class RecordFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         btn_record = new javax.swing.JToggleButton();
+        recordCanvas = new RecordCanvas();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(247, 247, 247));
 
         btn_record.setText("Record");
         btn_record.addActionListener(new java.awt.event.ActionListener() {
@@ -51,19 +57,36 @@ public class RecordFrame extends javax.swing.JFrame {
             }
         });
 
+        recordCanvas.setBackground(new java.awt.Color(243, 243, 243));
+
+        javax.swing.GroupLayout recordCanvasLayout = new javax.swing.GroupLayout(recordCanvas);
+        recordCanvas.setLayout(recordCanvasLayout);
+        recordCanvasLayout.setHorizontalGroup(
+            recordCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 580, Short.MAX_VALUE)
+        );
+        recordCanvasLayout.setVerticalGroup(
+            recordCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btn_record)
-                .addContainerGap(646, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btn_record)
+                    .addComponent(recordCanvas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(332, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(recordCanvas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btn_record)
                 .addContainerGap())
         );
@@ -76,12 +99,26 @@ public class RecordFrame extends javax.swing.JFrame {
         {
             btn_record.setText("Stop");
             recordThread = new RecordThread();
+            //wavUptThread = new UpdateWaveformThread();
             recordThread.start();
+            //wavUptThread.start();
         }
         else
         {
             btn_record.setText("Record");
             recordThread.exit();
+            //wavUptThread.exit();
+            //wavUptThread.interrupt();
+            
+                ShortBuffer    sBuf = ByteBuffer.wrap(out.toByteArray()).asShortBuffer();
+                System.out.println(ByteBuffer.wrap(out.toByteArray()).capacity());
+            short[] temp = sBuf.array();
+                    ArrayList<Double> data = new ArrayList<Double>();
+                    for (int i = 0; i < temp.length; i++)
+                    {
+                        data.add(temp[i] / 32768.0);
+                    }
+                    recordCanvas.setData(data, 2.0, (int)recordCanvas.getPreferredSize().getHeight());
         }
     }//GEN-LAST:event_btn_recordActionPerformed
 
@@ -122,12 +159,54 @@ public class RecordFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btn_record;
+    private RecordCanvas recordCanvas;
     // End of variables declaration//GEN-END:variables
-
+    class UpdateWaveformThread extends Thread
+    {
+        private boolean bExitFlag = false;
+        @Override
+        public void run()
+        {
+            ShortBuffer sBuf = ShortBuffer.allocate(0);
+            while (!bExitFlag)
+            {
+                
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException ex) {
+                    System.out.println("Interuppted, exit");
+                    bExitFlag = true;
+                }
+                System.out.println("Outer");
+                if (out != null)
+                {
+                    sBuf = ByteBuffer.wrap(out.toByteArray()).asShortBuffer();
+                    System.out.println("Wrapped");
+                }
+                if (sBuf.hasArray())
+                {
+                    System.out.println("Update");
+                    
+                    short[] temp = sBuf.array();
+                    ArrayList<Double> data = new ArrayList<Double>();
+                    for (int i = 0; i < temp.length; i++)
+                    {
+                        data.add(temp[i] / 32768.0);
+                    }
+                    recordCanvas.setData(data, 2.0, (int)recordCanvas.getPreferredSize().getHeight());
+                }
+            }
+        }
+        public void exit()
+        {
+            bExitFlag = true;
+        }
+    }
     class RecordThread extends Thread
     {
-        private boolean bExitThread = true;
+        private boolean bExitThread = false;
         
+        @Override
         public void run()
         {
             TargetDataLine line = null;
@@ -176,7 +255,7 @@ public class RecordFrame extends javax.swing.JFrame {
                 Logger.getLogger(RecordFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
             line2.start();
-            line2.write(out.toByteArray(), 0, 20*data.length);
+            line2.write(out.toByteArray(), 0, out.toByteArray().length);
             line2.drain();
             line2.close();
                     
