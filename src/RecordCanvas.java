@@ -64,11 +64,11 @@ public class RecordCanvas extends JPanel {
         if (data != null)
         {
             Graphics2D g2d = (Graphics2D) g;
-            double increment = data.size() / (double)winWidth;
-            for (int i = 0; i < winWidth - 1; i++)
+            double increment = (double)winWidth / data.size();
+            for (int i = 0; i < data.size() - 1; i++)
             {
-                Line2D line = new Line2D.Double(i, winHeight - ((data.get((int)(i*increment)))/max * winHeight + offset),
-                                                i + 1, winHeight - ((data.get((int)((i+1)*increment)))/max * winHeight + offset));
+                Line2D line = new Line2D.Double((int)(i * increment), winHeight - (data.get(i)/max * winHeight + offset),
+                                                (int)((i + 1)*increment), winHeight - (data.get(i+1)/max * winHeight + offset));
                 g2d.draw(line);
             }
         }

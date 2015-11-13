@@ -99,26 +99,16 @@ public class RecordFrame extends javax.swing.JFrame {
         {
             btn_record.setText("Stop");
             recordThread = new RecordThread();
-            //wavUptThread = new UpdateWaveformThread();
+            wavUptThread = new UpdateWaveformThread();
             recordThread.start();
-            //wavUptThread.start();
+            wavUptThread.start();
         }
         else
         {
             btn_record.setText("Record");
             recordThread.exit();
-            //wavUptThread.exit();
-            //wavUptThread.interrupt();
-            
-                ShortBuffer    sBuf = ByteBuffer.wrap(out.toByteArray()).asShortBuffer();
-                System.out.println(ByteBuffer.wrap(out.toByteArray()).capacity());
-            short[] temp = sBuf.array();
-                    ArrayList<Double> data = new ArrayList<Double>();
-                    for (int i = 0; i < temp.length; i++)
-                    {
-                        data.add(temp[i] / 32768.0);
-                    }
-                    recordCanvas.setData(data, 2.0, (int)recordCanvas.getPreferredSize().getHeight());
+            wavUptThread.exit();
+            wavUptThread.interrupt();
         }
     }//GEN-LAST:event_btn_recordActionPerformed
 
@@ -177,23 +167,16 @@ public class RecordFrame extends javax.swing.JFrame {
                     System.out.println("Interuppted, exit");
                     bExitFlag = true;
                 }
-                System.out.println("Outer");
                 if (out != null)
                 {
                     sBuf = ByteBuffer.wrap(out.toByteArray()).asShortBuffer();
-                    System.out.println("Wrapped");
-                }
-                if (sBuf.hasArray())
-                {
-                    System.out.println("Update");
                     
-                    short[] temp = sBuf.array();
                     ArrayList<Double> data = new ArrayList<Double>();
-                    for (int i = 0; i < temp.length; i++)
+                    for (int i = 0; i < sBuf.capacity(); i++)
                     {
-                        data.add(temp[i] / 32768.0);
+                        data.add(sBuf.get(i) / 32768.0);
                     }
-                    recordCanvas.setData(data, 2.0, (int)recordCanvas.getPreferredSize().getHeight());
+                    recordCanvas.setData(data, 2.0, (int)recordCanvas.getPreferredSize().getHeight() / 2);
                 }
             }
         }
