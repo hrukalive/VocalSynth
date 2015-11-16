@@ -30,7 +30,7 @@ public class RecordFrame extends javax.swing.JFrame {
     private String state = "Idle";
     private int leftCursor = 0;
     private int rightCursor = 0;
-    private short[] data;
+    private ArrayList<Double> data = new ArrayList<Double>();
     /**
      * Creates new form RecordFrame
      */
@@ -134,17 +134,22 @@ public class RecordFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_recordActionPerformed
 
     private void btn_analyzeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_analyzeActionPerformed
-        double[] s = new double[256];
-        double[] m = new double[256];
-        for (int i = 0; i < 256; i++)
+        if (state.equals("CutR"))
         {
-            s[i] = Math.sin(2*Math.PI/256.0*i);
-            m[i] = 0;
-        }
-        Fft.transform(s, m);
-        for (int i = 0; i < 256; i++)
-        {
-            System.out.println(s[i]+"+"+m[i]+"i");
+            double[] real = new double[data.size()];
+            double[] imag = new double[data.size()];
+            Fft.transform(real, imag);
+            double[] abs = new double[data.size()];
+            double max = 0.0;
+            for (int i = 0; i < real.length; i++)
+            {
+                abs[i] = Math.sqrt(real[i]*real[i]+imag[i]*imag[i]);
+                if (abs[i] > max)
+                    max = abs[i];
+            }
+            recordCanvas.setData(abs, max, (int)recordCanvas.getPreferredSize().getHeight(), true);
+            
+            state = "Analyzed";
         }
     }//GEN-LAST:event_btn_analyzeActionPerformed
     
@@ -161,15 +166,13 @@ public class RecordFrame extends javax.swing.JFrame {
             state = "CutR";
             ShortBuffer sBuf = ByteBuffer.wrap(out.toByteArray()).asShortBuffer();
             rightCursor = (int)((double)x / recordCanvas.getPreferredSize().getWidth() * sBuf.capacity());
-            
-            data = new short[rightCursor - leftCursor];
-            ArrayList<Double> temp = new ArrayList<Double>();
+            System.out.println(sBuf.capacity());
+            System.out.println(leftCursor+" "+rightCursor);
             for (int i = 0; i < rightCursor - leftCursor; i++)
             {
-                data[i] = sBuf.get(i + leftCursor);
-                temp.add(data[i] / 32768.0);
+                data.add(sBuf.get(i + leftCursor) / 32768.0);
             }
-            recordCanvas.setData(temp, 2.0, (int)recordCanvas.getPreferredSize().getHeight() / 2);
+            recordCanvas.setData(data, 2.0, (int)recordCanvas.getPreferredSize().getHeight() / 2);
         }
     }
     
