@@ -138,6 +138,11 @@ public class RecordFrame extends javax.swing.JFrame {
         {
             double[] real = new double[data.size()];
             double[] imag = new double[data.size()];
+            for (int i = 0; i < data.size(); i++)
+            {
+                real[i] = data.get(i);
+                imag[i] = 0.0;
+            }
             Fft.transform(real, imag);
             double[] abs = new double[data.size()];
             double max = 0.0;
@@ -147,7 +152,7 @@ public class RecordFrame extends javax.swing.JFrame {
                 if (abs[i] > max)
                     max = abs[i];
             }
-            recordCanvas.setData(abs, max, (int)recordCanvas.getPreferredSize().getHeight(), true);
+            recordCanvas.setDataHalf(abs, max, 0, false);
             
             state = "Analyzed";
         }

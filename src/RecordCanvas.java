@@ -20,6 +20,7 @@ public class RecordCanvas extends JPanel {
     private ArrayList<Double> data;
     private double max;
     private int offset;
+    private boolean isLog = false;
     public RecordCanvas() {
         setBorder(BorderFactory.createLineBorder(Color.black));
 
@@ -48,15 +49,17 @@ public class RecordCanvas extends JPanel {
         this.offset = offset;
         repaint();
     }
-    public void setData(double[] data, double max, int offset, boolean negate)
+    public void setDataHalf(double[] data, double max, int offset, boolean negate)
     {
         this.data = new ArrayList<Double>();
-        for (int i = 0; i < data.length; i++)
+        for (int i = 0; i < data.length / 2; i++)
         {
             this.data.add((negate?-data[i]:data[i]));
+            //System.out.println(this.data.get(i));
         }
         this.max = max;
         this.offset = offset;
+        isLog = true;
         repaint();
     }
     @Override
