@@ -27,6 +27,10 @@ public class RecordFrame extends javax.swing.JFrame {
     private RecordThread recordThread;
     private UpdateWaveformThread wavUptThread;
     private ByteArrayOutputStream out;
+    private String state = "Idle";
+    private int leftCursor = 0;
+    private int rightCursor = 0;
+    private short[] data;
     /**
      * Creates new form RecordFrame
      */
@@ -95,23 +99,51 @@ public class RecordFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_recordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_recordActionPerformed
-        if (btn_record.isSelected())
+        if (state.equals("Idle") || state.equals("Recorded"))
         {
-            btn_record.setText("Stop");
-            recordThread = new RecordThread();
-            wavUptThread = new UpdateWaveformThread();
-            recordThread.start();
-            wavUptThread.start();
-        }
-        else
-        {
-            btn_record.setText("Record");
-            recordThread.exit();
-            wavUptThread.exit();
-            wavUptThread.interrupt();
+            if (btn_record.isSelected())
+            {
+                btn_record.setText("Stop");
+                recordThread = new RecordThread();
+                wavUptThread = new UpdateWaveformThread();
+                recordThread.start();
+                wavUptThread.start();
+            }
+            else
+            {
+                btn_record.setText("Record");
+                recordThread.exit();
+                wavUptThread.exit();
+                wavUptThread.interrupt();
+                state = "Recorded";
+            }
         }
     }//GEN-LAST:event_btn_recordActionPerformed
-
+    
+    public void process(int x,int y)
+    {
+        if (state.equals("Recorded"))
+        {
+            state = "CutL";
+            leftCursor = (int)((double)x / recordCanvas.getPreferredSize().getWidth() * ByteBuffer.wrap(out.toByteArray()).asShortBuffer().capacity());
+        }
+        else if (state.equals("CutL"))
+        {
+            state = "CutR";
+            ShortBuffer sBuf = ByteBuffer.wrap(out.toByteArray()).asShortBuffer();
+            rightCursor = (int)((double)x / recordCanvas.getPreferredSize().getWidth() * sBuf.capacity());
+            
+            data = new short[rightCursor - leftCursor];
+            ArrayList<Double> temp = new ArrayList<Double>();
+            for (int i = 0; i < rightCursor - leftCursor; i++)
+            {
+                data[i] = sBuf.get(i + leftCursor);
+                temp.add(data[i] / 32768.0);
+            }
+            recordCanvas.setData(temp, 2.0, (int)recordCanvas.getPreferredSize().getHeight() / 2);
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -225,7 +257,7 @@ public class RecordFrame extends javax.swing.JFrame {
             line.close();
             
             
-            info = new DataLine.Info(SourceDataLine.class, format);
+            /*info = new DataLine.Info(SourceDataLine.class, format);
             SourceDataLine line2 = null;
             try {
                 line2 = (SourceDataLine) AudioSystem.getLine(info);
@@ -240,7 +272,7 @@ public class RecordFrame extends javax.swing.JFrame {
             line2.start();
             line2.write(out.toByteArray(), 0, out.toByteArray().length);
             line2.drain();
-            line2.close();
+            line2.close();*/
                     
         }
         

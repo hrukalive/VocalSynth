@@ -22,24 +22,13 @@ public class RecordCanvas extends JPanel {
     private int offset;
     public RecordCanvas() {
         setBorder(BorderFactory.createLineBorder(Color.black));
-        /*amps = new int[winWidth];
-        for (int i = 0; i < winWidth; i++)
-            amps[i] = winHeight;
 
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                oldX = e.getX();
-                paintPoint(e.getX(),e.getY());
+                parent.process(e.getX(),e.getY());
             }
         });
-
-        addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                paintPoint(e.getX(),e.getY());
-            }
-        });*/
         
     }
     public void setParent(RecordFrame parent)
