@@ -20,6 +20,9 @@ public class RecordCanvas extends JPanel {
     private ArrayList<Double> data;
     private double max;
     private int offset;
+    private int leftCursor = 0;
+    private int rightCursor = winWidth;
+    private boolean isFill = false;
     public RecordCanvas() {
         setBorder(BorderFactory.createLineBorder(Color.black));
 
@@ -30,10 +33,23 @@ public class RecordCanvas extends JPanel {
             }
         });
         
+        /*addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                parent.process(e.getX(),e.getY());
+            }
+        });*/
     }
     public void setParent(RecordFrame parent)
     {
         this.parent = parent;
+    }
+    public void setCursor(int left, int right)
+    {
+        leftCursor = left;
+        rightCursor = right;
+        isFill = true;
+        repaint();
     }
     public void setData(ArrayList<Double> data, double max, int offset)
     {
@@ -50,6 +66,8 @@ public class RecordCanvas extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        if (!isFill)
+        {
         if (data != null)
         {
             Graphics2D g2d = (Graphics2D) g;
@@ -60,6 +78,11 @@ public class RecordCanvas extends JPanel {
                                                 (int)((i + 1)*increment), winHeight - (data.get(i+1)/max * winHeight + offset));
                 g2d.draw(line);
             }
+        }
+        }else{
+        g.fillRect(0, 0, leftCursor, winHeight);
+        g.fillRect(rightCursor, 0, winWidth - rightCursor, winHeight);
+        isFill = false;
         }
     }
 }

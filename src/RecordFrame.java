@@ -50,6 +50,7 @@ public class RecordFrame extends javax.swing.JFrame {
 
         btn_record = new javax.swing.JToggleButton();
         recordCanvas = new RecordCanvas();
+        btn_analyze = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(247, 247, 247));
@@ -74,6 +75,13 @@ public class RecordFrame extends javax.swing.JFrame {
             .addGap(0, 300, Short.MAX_VALUE)
         );
 
+        btn_analyze.setText("Analyze");
+        btn_analyze.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_analyzeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -81,7 +89,10 @@ public class RecordFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btn_record)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btn_record)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_analyze))
                     .addComponent(recordCanvas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -91,7 +102,9 @@ public class RecordFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(recordCanvas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btn_record)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_record)
+                    .addComponent(btn_analyze))
                 .addContainerGap())
         );
 
@@ -119,6 +132,22 @@ public class RecordFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btn_recordActionPerformed
+
+    private void btn_analyzeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_analyzeActionPerformed
+        double[] s = new double[256];
+        double[] m = new double[256];
+        for (int i = 0; i < 256; i++)
+        {
+            s[i] = Math.sin(2*Math.PI/256.0*i);
+            m[i] = 0;
+        }
+        Fft.transform(s, m);
+        for (int i = 0; i < 256; i++)
+        {
+            System.out.println(s[i]+"+"+m[i]+"i");
+        }
+    }//GEN-LAST:event_btn_analyzeActionPerformed
+    
     
     public void process(int x,int y)
     {
@@ -180,6 +209,7 @@ public class RecordFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btn_analyze;
     private javax.swing.JToggleButton btn_record;
     private RecordCanvas recordCanvas;
     // End of variables declaration//GEN-END:variables
