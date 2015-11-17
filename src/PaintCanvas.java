@@ -150,7 +150,7 @@ public class PaintCanvas extends JPanel {
         }
     }
     
-    public void interpolate(ArrayList<Double> read_amps, double T)
+    /*public void interpolate(ArrayList<Double> read_amps, double T)
     {
         double[] damps = new double[winWidth];
         for (int i = 0; i < amps.length; i++)
@@ -166,6 +166,29 @@ public class PaintCanvas extends JPanel {
                 damps[i] = -90;
             amps[i] = (int)(damps[i]/(-90.0)*winHeight);
             //amps[i] = (int)(sinc((i-T)/(double)T)*winHeight);
+        }
+    }*/
+    public void interpolate(ArrayList<Double> read_amps, double maxFreq, double f0)
+    {
+        double T = f0;
+        double[] damps = new double[(int)maxFreq];
+        
+        for (int i = 0; i < damps.length; i++)
+        {
+            damps[i] = 0;
+            for (int j = 1; j <= read_amps.size(); j++)
+            {
+                damps[i] += read_amps.get(j - 1) * sinc((i - j * T) / T);
+            }
+            if (damps[i]>3.1623e-5)
+                damps[i] = 20*Math.log10(damps[i]);
+            else
+                damps[i] = -90;
+        }
+        
+        for (int i = 0; i < amps.length; i++)
+        {
+            amps[i] = (int)(damps[i*damps.length/amps.length]/(-90.0)*winHeight);
         }
     }
     

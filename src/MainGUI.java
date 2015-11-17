@@ -528,7 +528,7 @@ public class MainGUI extends javax.swing.JFrame {
             
             int maxFreq = (int)Double.parseDouble(txt_maxFreq.getText());
             
-            freqs.clear();
+            /*freqs.clear();
             for (int j = 1; j * f0 <= (double)maxFreq; j++)
             {
                 freqs.add((int)Math.round((j * f0) / (double)maxFreq * (freqPaintCanvas.getPreferredSize().getWidth() - 1)));
@@ -539,7 +539,9 @@ public class MainGUI extends javax.swing.JFrame {
                          - Math.round(f0 / (double) maxFreq * (freqPaintCanvas.getPreferredSize().getWidth() - 1)));
             phasePaintCanvas.interpolate(phases_read, 
                     Math.round(2 * f0 / (double) maxFreq * (phasePaintCanvas.getPreferredSize().getWidth() - 1)) 
-                         - Math.round(f0 / (double) maxFreq * (phasePaintCanvas.getPreferredSize().getWidth() - 1)));
+                         - Math.round(f0 / (double) maxFreq * (phasePaintCanvas.getPreferredSize().getWidth() - 1)));*/
+            freqPaintCanvas.interpolate(amps_read, maxFreq, f0);
+            phasePaintCanvas.interpolate(phases_read, maxFreq, f0);
             generateFreqLine(f0, maxFreq);
 
         }

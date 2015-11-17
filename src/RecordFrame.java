@@ -31,6 +31,7 @@ public class RecordFrame extends javax.swing.JFrame {
     private int leftCursor = 0;
     private int rightCursor = 0;
     private ArrayList<Double> data = new ArrayList<Double>();
+    private double[] abs;
     /**
      * Creates new form RecordFrame
      */
@@ -51,6 +52,7 @@ public class RecordFrame extends javax.swing.JFrame {
         btn_record = new javax.swing.JToggleButton();
         recordCanvas = new RecordCanvas();
         btn_analyze = new javax.swing.JButton();
+        label_info = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(247, 247, 247));
@@ -82,6 +84,8 @@ public class RecordFrame extends javax.swing.JFrame {
             }
         });
 
+        label_info.setText("Press 'Record' to start recording.");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -90,11 +94,15 @@ public class RecordFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(recordCanvas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(btn_record)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_analyze))
-                    .addComponent(recordCanvas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(btn_analyze)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(label_info)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -104,7 +112,8 @@ public class RecordFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_record)
-                    .addComponent(btn_analyze))
+                    .addComponent(btn_analyze)
+                    .addComponent(label_info))
                 .addContainerGap())
         );
 
@@ -129,6 +138,7 @@ public class RecordFrame extends javax.swing.JFrame {
                 wavUptThread.exit();
                 wavUptThread.interrupt();
                 state = "Recorded";
+                label_info.setText("Please set the left cursor.");
             }
         }
     }//GEN-LAST:event_btn_recordActionPerformed
@@ -136,25 +146,30 @@ public class RecordFrame extends javax.swing.JFrame {
     private void btn_analyzeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_analyzeActionPerformed
         if (state.equals("CutR"))
         {
-            double[] real = new double[data.size()];
-            double[] imag = new double[data.size()];
-            for (int i = 0; i < data.size(); i++)
+            int size = data.size()-data.size()%2;
+            double[] real = new double[size];
+            double[] imag = new double[size];
+            for (int i = 0; i < size; i++)
             {
-                real[i] = data.get(i);
+                real[i] = data.get(i) * (0.5 * (1 - Math.cos(2 * Math.PI * i / (size - 1))));
                 imag[i] = 0.0;
             }
             Fft.transform(real, imag);
-            double[] abs = new double[data.size()];
+            abs = new double[size];
+            ArrayList<Double> display_part = new ArrayList<Double>();
             double max = 0.0;
             for (int i = 0; i < real.length; i++)
             {
                 abs[i] = Math.sqrt(real[i]*real[i]+imag[i]*imag[i]);
-                if (abs[i] > max)
+                if (i < 4000/44100.0*(size-1))
+                    display_part.add(abs[i]);
+                if (abs[i] > max && i < 4000/44100.0*(size-1))
                     max = abs[i];
             }
-            recordCanvas.setDataHalf(abs, max, 0, false);
+            recordCanvas.setData(display_part, max, 0);
             
             state = "Analyzed";
+            label_info.setText("Please click near the F0.");
         }
     }//GEN-LAST:event_btn_analyzeActionPerformed
     
@@ -165,6 +180,7 @@ public class RecordFrame extends javax.swing.JFrame {
         {
             state = "CutL";
             leftCursor = (int)((double)x / recordCanvas.getPreferredSize().getWidth() * ByteBuffer.wrap(out.toByteArray()).asShortBuffer().capacity());
+            label_info.setText("Please set the right cursor.");
         }
         else if (state.equals("CutL"))
         {
@@ -178,6 +194,11 @@ public class RecordFrame extends javax.swing.JFrame {
                 data.add(sBuf.get(i + leftCursor) / 32768.0);
             }
             recordCanvas.setData(data, 2.0, (int)recordCanvas.getPreferredSize().getHeight() / 2);
+            label_info.setText("Press \'Analyze\' to analyze.");
+        }
+        else if (state.equals("Analyzed"))
+        {
+            
         }
     }
     
@@ -219,6 +240,7 @@ public class RecordFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_analyze;
     private javax.swing.JToggleButton btn_record;
+    private javax.swing.JLabel label_info;
     private RecordCanvas recordCanvas;
     // End of variables declaration//GEN-END:variables
     class UpdateWaveformThread extends Thread

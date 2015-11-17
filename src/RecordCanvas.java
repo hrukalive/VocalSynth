@@ -81,5 +81,6 @@ public class RecordCanvas extends JPanel {
                 g2d.draw(line);
             }
         }
+        isLog = false;
     }
 }

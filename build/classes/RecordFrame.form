@@ -29,14 +29,19 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="recordCanvas" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
                       <Component id="btn_record" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btn_analyze" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="label_info" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="recordCanvas" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -49,6 +54,7 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btn_record" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btn_analyze" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="label_info" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -91,6 +97,11 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_analyzeActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="label_info">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Press &apos;Record&apos; to start recording."/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>
