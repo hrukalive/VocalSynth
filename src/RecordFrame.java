@@ -204,8 +204,17 @@ public class RecordFrame extends javax.swing.JFrame {
             double f0p = (int)(((double)x / recordCanvas.getPreferredSize().getWidth() * 4000 ) / 44100.0 * (size - 1));
             int region = (int)(100 / 44100.0 * (size - 1)) / 2;
             
-            
+            int f0i = findMax(abs, (int)f0p - region, (int)f0p + region);
         }
+    }
+    
+    private int findMax(double[] vals, int lo, int hi)
+    {
+        int max = lo;
+        for (int i = lo + 1; i <= hi; i++)
+            if (vals[i] > vals[max])
+                max = i;
+        return max;
     }
     
     /**
