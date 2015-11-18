@@ -26,12 +26,14 @@ public class RecordFrame extends javax.swing.JFrame {
     
     private RecordThread recordThread;
     private UpdateWaveformThread wavUptThread;
+    private MainGUI parent;
     private ByteArrayOutputStream out;
     private String state = "Idle";
     private int leftCursor = 0;
     private int rightCursor = 0;
     private ArrayList<Double> data = new ArrayList<Double>();
     private double[] abs;
+    private double[] phs;
     /**
      * Creates new form RecordFrame
      */
@@ -39,7 +41,10 @@ public class RecordFrame extends javax.swing.JFrame {
         initComponents();
         recordCanvas.setParent(this);
     }
-
+    public void setParent(MainGUI parent)
+    {
+        this.parent = parent;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -156,11 +161,13 @@ public class RecordFrame extends javax.swing.JFrame {
             }
             Fft.transform(real, imag);
             abs = new double[size];
+            phs = new double[size];
             ArrayList<Double> display_part = new ArrayList<Double>();
             double max = 0.0;
             for (int i = 0; i < real.length; i++)
             {
                 abs[i] = Math.sqrt(real[i]*real[i]+imag[i]*imag[i]);
+                phs[i] = Math.atan2(imag[i], real[i]);
                 if (i < 4000/44100.0*(size-1))
                     display_part.add(abs[i]);
                 if (abs[i] > max && i < 4000/44100.0*(size-1))
@@ -205,6 +212,26 @@ public class RecordFrame extends javax.swing.JFrame {
             int region = (int)(100 / 44100.0 * (size - 1)) / 2;
             
             int f0i = findMax(abs, (int)f0p - region, (int)f0p + region);
+            f0p = (f0i / (double)(size - 1) * 44100.0);
+            
+            label_info.setText("F0: "+String.format("%.2f", f0p) + "Hz Amp: " + abs[f0i]);
+            
+            ArrayList<Double> amps = new ArrayList<Double>();
+            ArrayList<Double> phases = new ArrayList<Double>();
+            double max = 0.0;
+            for (int i = 1; i*f0p < 10000; i++)
+            {
+                int fi = findMax(abs, i * f0i - region, i * f0i + region);
+                amps.add(abs[fi]);
+                if (amps.get(i - 1) > max)
+                    max = amps.get(i-1);
+                phases.add(phs[fi]);
+            }
+            for (int i = 0; i < amps.size(); i++)
+                amps.set(i, amps.get(i) / max);
+            
+            parent.setFromRecord(f0p, amps, phases);
+            state = "done";
         }
     }
     

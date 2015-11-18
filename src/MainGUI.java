@@ -41,6 +41,7 @@ public class MainGUI extends javax.swing.JFrame {
         fc = new JFileChooser();
         freqPaintCanvas.setParent(this, freqs);
         phasePaintCanvas.setParent(this, freqs);
+        
         amplitudes = freqPaintCanvas.getAmplitudes();
         phases = phasePaintCanvas.getPhases();
         generateFreqLine(Double.parseDouble(txt_voiceFreq.getText()), Integer.parseInt(txt_maxFreq.getText()));
@@ -546,7 +547,19 @@ public class MainGUI extends javax.swing.JFrame {
 
         }
     }//GEN-LAST:event_btn_loadActionPerformed
-
+    public void setFromRecord(double f0, ArrayList<Double> amps, ArrayList<Double> phss)
+    {
+        txt_voiceFreq.setText("" + f0);
+        txt_maxFreq.setText("11100");
+        slider_voiceFreq.setValue((int)Double.parseDouble(txt_voiceFreq.getText()));
+        slider_freq.setValue(Integer.parseInt(txt_maxFreq.getText()));
+            
+        int maxFreq = (int)Double.parseDouble(txt_maxFreq.getText());
+        
+        freqPaintCanvas.interpolate(amps, maxFreq, f0);
+        phasePaintCanvas.interpolate(phss, maxFreq, f0);
+        generateFreqLine(f0, maxFreq);
+    }
     private void btn_saveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_saveActionPerformed
         int returnVal = fc.showSaveDialog(MainGUI.this);
         
@@ -601,6 +614,7 @@ public class MainGUI extends javax.swing.JFrame {
         RecordFrame recordFrame = new RecordFrame();
         recordFrame.setVisible(true);
         recordFrame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        recordFrame.setParent(this);
     }//GEN-LAST:event_btn_recordActionPerformed
 
     private void btn_phaseClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_phaseClearActionPerformed
