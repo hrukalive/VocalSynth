@@ -198,6 +198,12 @@ public class RecordFrame extends javax.swing.JFrame {
         }
         else if (state.equals("Analyzed"))
         {
+            int size = data.size()-data.size()%2;
+            //label_info.setText((double)x / recordCanvas.getPreferredSize().getWidth() * 4000 + "");
+          
+            double f0p = (int)(((double)x / recordCanvas.getPreferredSize().getWidth() * 4000 ) / 44100.0 * (size - 1));
+            int region = (int)(100 / 44100.0 * (size - 1)) / 2;
+            
             
         }
     }
