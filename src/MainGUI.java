@@ -547,10 +547,10 @@ public class MainGUI extends javax.swing.JFrame {
 
         }
     }//GEN-LAST:event_btn_loadActionPerformed
-    public void setFromRecord(double f0, ArrayList<Double> amps, ArrayList<Double> phss)
+    public void setFromRecord(int f0, ArrayList<Double> amps, ArrayList<Double> phss)
     {
         txt_voiceFreq.setText("" + f0);
-        txt_maxFreq.setText("11100");
+        txt_maxFreq.setText("15500");
         slider_voiceFreq.setValue((int)Double.parseDouble(txt_voiceFreq.getText()));
         slider_freq.setValue(Integer.parseInt(txt_maxFreq.getText()));
             
@@ -767,7 +767,12 @@ public class MainGUI extends javax.swing.JFrame {
 //                            dSampleVal += 1.0 / factor * amplitudes.get(j) * Math.sin(2 * Math.PI * (j + 1) * fCyclePosition + phases.get(j));
 //                        }
                         for (int j = 1; j * fFreq <= (double)maxFreq; j++)
-                            dSampleVal += 1.0 / factor * getAmplitude(j * fFreq, maxFreq) * Math.sin(2 * Math.PI * j * fCyclePosition + getPhase(j * fFreq, maxFreq));
+                        {
+                            double temp = getAmplitude(j * fFreq, maxFreq);
+                            if (temp < 1e-16)
+                                continue;
+                            dSampleVal += 1.0 / factor * temp * Math.sin(2 * Math.PI * j * fCyclePosition + getPhase(j * fFreq, maxFreq));
+                        }
                         cBuf.putShort((short) (Short.MAX_VALUE * 0.5 * dSampleVal));
 
                         fCyclePosition += fCycleInc;

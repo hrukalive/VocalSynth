@@ -1,5 +1,7 @@
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.logging.Level;
@@ -11,6 +13,8 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.TargetDataLine;
 import java.util.ArrayList;
+import javax.sound.sampled.AudioInputStream;
+import javax.swing.JFileChooser;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -34,11 +38,13 @@ public class RecordFrame extends javax.swing.JFrame {
     private ArrayList<Double> data = new ArrayList<Double>();
     private double[] abs;
     private double[] phs;
+    JFileChooser fc;
     /**
      * Creates new form RecordFrame
      */
     public RecordFrame() {
         initComponents();
+        fc = new JFileChooser();
         recordCanvas.setParent(this);
     }
     public void setParent(MainGUI parent)
@@ -58,6 +64,7 @@ public class RecordFrame extends javax.swing.JFrame {
         recordCanvas = new RecordCanvas();
         btn_analyze = new javax.swing.JButton();
         label_info = new javax.swing.JLabel();
+        btn_open = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(247, 247, 247));
@@ -91,6 +98,13 @@ public class RecordFrame extends javax.swing.JFrame {
 
         label_info.setText("Press 'Record' to start recording.");
 
+        btn_open.setText("Open");
+        btn_open.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_openActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -102,7 +116,9 @@ public class RecordFrame extends javax.swing.JFrame {
                         .addComponent(recordCanvas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btn_record)
+                        .addComponent(btn_record, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_open, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_analyze)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -118,7 +134,8 @@ public class RecordFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_record)
                     .addComponent(btn_analyze)
-                    .addComponent(label_info))
+                    .addComponent(label_info)
+                    .addComponent(btn_open))
                 .addContainerGap())
         );
 
@@ -179,6 +196,50 @@ public class RecordFrame extends javax.swing.JFrame {
             label_info.setText("Please click near the F0.");
         }
     }//GEN-LAST:event_btn_analyzeActionPerformed
+
+    private void btn_openActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_openActionPerformed
+        if (!state.equals("Idle") && !state.equals("Recorded"))
+            return;
+        int returnVal = fc.showOpenDialog(RecordFrame.this);
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION)
+        {
+            File file = fc.getSelectedFile();
+            Wave.WavFile wavFile = null;
+            try {
+                wavFile = Wave.WavFile.openWavFile(file);
+            } catch (IOException ex) {
+                Logger.getLogger(RecordFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Wave.WavFileException ex) {
+                Logger.getLogger(RecordFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            long numFrame = wavFile.getNumFrames();
+            short[] shortArr = new short[(int)numFrame];
+            try {
+                wavFile.readFramesChanel(shortArr, (int)numFrame, 0);
+            } catch (IOException ex) {
+                Logger.getLogger(RecordFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Wave.WavFileException ex) {
+                Logger.getLogger(RecordFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            out = new ByteArrayOutputStream();
+            ShortBuffer sBuf = ShortBuffer.wrap(shortArr);
+            ByteBuffer byteBuf = ByteBuffer.allocate((int)numFrame * 2);
+            for (short s : shortArr) byteBuf.putShort(s);
+            byteBuf.compact();
+            try {
+                out.write(byteBuf.array());
+            } catch (IOException ex) {
+                Logger.getLogger(RecordFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            ArrayList<Double> data = new ArrayList<Double>();
+            for (int i = 0; i < sBuf.capacity(); i++) {
+                data.add(sBuf.get(i) / 32768.0);
+            }
+            recordCanvas.setData(data, 2.0, (int) recordCanvas.getPreferredSize().getHeight() / 2);
+            state = "Recorded";
+        }
+    }//GEN-LAST:event_btn_openActionPerformed
     
     
     public void process(int x,int y)
@@ -196,6 +257,7 @@ public class RecordFrame extends javax.swing.JFrame {
             rightCursor = (int)((double)x / recordCanvas.getPreferredSize().getWidth() * sBuf.capacity());
             System.out.println(sBuf.capacity());
             System.out.println(leftCursor+" "+rightCursor);
+            data.clear();
             for (int i = 0; i < rightCursor - leftCursor; i++)
             {
                 data.add(sBuf.get(i + leftCursor) / 32768.0);
@@ -219,7 +281,7 @@ public class RecordFrame extends javax.swing.JFrame {
             ArrayList<Double> amps = new ArrayList<Double>();
             ArrayList<Double> phases = new ArrayList<Double>();
             double max = 0.0;
-            for (int i = 1; i*f0p < 10000; i++)
+            for (int i = 1; i*f0p < 15000; i++)
             {
                 int fi = findMax(abs, i * f0i - region, i * f0i + region);
                 amps.add(abs[fi]);
@@ -230,8 +292,8 @@ public class RecordFrame extends javax.swing.JFrame {
             for (int i = 0; i < amps.size(); i++)
                 amps.set(i, amps.get(i) / max);
             
-            parent.setFromRecord(f0p, amps, phases);
-            state = "done";
+            parent.setFromRecord((int)Math.round(f0p), amps, phases);
+            state = "Idle";
         }
     }
     
@@ -281,6 +343,7 @@ public class RecordFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_analyze;
+    private javax.swing.JButton btn_open;
     private javax.swing.JToggleButton btn_record;
     private javax.swing.JLabel label_info;
     private RecordCanvas recordCanvas;
@@ -294,7 +357,6 @@ public class RecordFrame extends javax.swing.JFrame {
             ShortBuffer sBuf = ShortBuffer.allocate(0);
             while (!bExitFlag)
             {
-                
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException ex) {
@@ -352,7 +414,7 @@ public class RecordFrame extends javax.swing.JFrame {
             while (!bExitThread) {
                // Read the next chunk of data from the TargetDataLine.
                numBytesRead =  line.read(data, 0, data.length);
-                System.out.println("numBytesRead");
+               // System.out.println("numBytesRead");
                // Save this chunk of data.
                out.write(data, 0, numBytesRead);
             }
