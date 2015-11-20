@@ -20,7 +20,6 @@ import javax.swing.JFileChooser;
 
 public class MainGUI extends JFrame
 {
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private ArrayList<Integer> freqs = new ArrayList<Integer>();
     private ArrayList<Double> realfreqs = new ArrayList<Double>();
 
@@ -94,22 +93,20 @@ public class MainGUI extends JFrame
         }
     };
 
-    // GUI components
     private SoundThread soundThread;
-    private FreqPaintCanvas freqPaintCanvas;
-    private PhasePaintCanvas phasePaintCanvas;
-    private WaveformCanvas waveformCanvas;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_addSet1;
     private javax.swing.JButton btn_addSet2;
     private javax.swing.JButton btn_freqClear;
     private javax.swing.JButton btn_load;
     private javax.swing.JButton btn_phaseClear;
+    private javax.swing.JToggleButton btn_play;
     private javax.swing.JButton btn_record;
     private javax.swing.JButton btn_save;
-    private javax.swing.JToggleButton btn_play;
     private javax.swing.JComboBox<String> combo_scale;
     private javax.swing.JComboBox<String> combo_type;
     private javax.swing.JPanel freeFreqChooser;
+    private FreqPaintCanvas freqPaintCanvas;
     private javax.swing.JPanel freqPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -123,6 +120,7 @@ public class MainGUI extends JFrame
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel label_freq;
+    private PhasePaintCanvas phasePaintCanvas;
     private javax.swing.JPanel phasePanel;
     private javax.swing.JPanel scaleFreqChooser;
     private javax.swing.JSlider slider_blend;
@@ -134,6 +132,7 @@ public class MainGUI extends JFrame
     private javax.swing.JTextField txt_maxFreq;
     private javax.swing.JTextField txt_offset;
     private javax.swing.JTextField txt_voiceFreq;
+    private WaveformCanvas waveformCanvas;
     // End of variables declaration//GEN-END:variables
 
     public MainGUI() {
@@ -195,8 +194,6 @@ public class MainGUI extends JFrame
 
         freqPanel.setBackground(new java.awt.Color(243, 243, 243));
         freqPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        freqPaintCanvas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         javax.swing.GroupLayout freqPaintCanvasLayout = new javax.swing.GroupLayout(freqPaintCanvas);
         freqPaintCanvas.setLayout(freqPaintCanvasLayout);
@@ -264,10 +261,10 @@ public class MainGUI extends JFrame
                     .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(freqPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(freqPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(freqPanelLayout.createSequentialGroup()
                         .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(83, 83, 83)
                         .addComponent(slider_freq, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(41, 41, 41)
                         .addComponent(txt_maxFreq, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -289,7 +286,6 @@ public class MainGUI extends JFrame
             .addGroup(freqPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(freqPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(freqPaintCanvas, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, freqPanelLayout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -299,7 +295,8 @@ public class MainGUI extends JFrame
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_addSet2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btn_freqClear)))
+                        .addComponent(btn_freqClear))
+                    .addComponent(freqPaintCanvas, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(freqPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(freqPanelLayout.createSequentialGroup()
                         .addGap(7, 7, 7)

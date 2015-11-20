@@ -20,7 +20,6 @@ import javax.swing.JFrame;
 public class RecordFrame extends JFrame
 {
     
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private RecordThread recordThread;
     private UpdateWaveformThread wavUptThread;
 
@@ -36,6 +35,7 @@ public class RecordFrame extends JFrame
 
     JFileChooser fc;
 
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_analyze;
     private javax.swing.JButton btn_open;
     private javax.swing.JToggleButton btn_record;
