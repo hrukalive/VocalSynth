@@ -1,26 +1,23 @@
 import javax.swing.JPanel;
-import java.awt.Color;
 import javax.swing.BorderFactory;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
+import java.awt.Color;
 import java.awt.event.MouseEvent;
-//import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
-//import java.awt.event.MouseMotionListener;
-//import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 
-public class PhasePaintCanvas extends JPanel {
+public class PhasePaintCanvas extends JPanel
+{
 
-    public final int[] amps;
+    public int[] amps;
     private ArrayList<Integer> freqs = new ArrayList<>();
-    private final ArrayList<Double> phases = new ArrayList<Double>();
+    private ArrayList<Double> phases = new ArrayList<Double>();
     public final int winWidth = 400;
     public final int winHeight = 100;
     private int oldX = 0;
-    private MainGUI parent;
     private int maxFreq = 10000;
 
     private final int[] amps1 = new int[winWidth];
@@ -28,6 +25,8 @@ public class PhasePaintCanvas extends JPanel {
     private boolean haveSet1 = false;
     private boolean haveSet2 = false;
     
+    private MainGUI parent;
+
     public PhasePaintCanvas() {
         setBorder(BorderFactory.createLineBorder(Color.black));
         amps = new int[winWidth];
@@ -57,6 +56,13 @@ public class PhasePaintCanvas extends JPanel {
         this.freqs = freqs;
     }
     
+    
+    public ArrayList<Double> getPhases()
+    {
+        return phases;
+    }
+
+    // Drawing are implemented here
     private void paintPoint(int x, int y) {
         if (x < 0 && x > -10)
             x = 0;
@@ -84,6 +90,8 @@ public class PhasePaintCanvas extends JPanel {
             parent.requestUpdateWaveform();
         }
     }
+
+    // Rescale the canvas when the range of shown freqency changes
     public void changeFreqRange(int freq)
     {
         if (freq < this.maxFreq)
@@ -121,32 +129,6 @@ public class PhasePaintCanvas extends JPanel {
         parent.requestUpdateWaveform();
     }
     
-    public ArrayList<Double> getPhases()
-    {
-        return phases;
-    }
-    
-    public void clear()
-    {
-        for (int i = 0; i < winWidth; i++)
-            amps[i] = winHeight / 2;
-        repaint();
-        recalc();
-        parent.requestUpdateWaveform();
-    }
-    
-    public void recalc()
-    {
-        phases.clear();
-        for (Integer i : freqs)
-        {
-            //synchronized(this)
-            //{
-            phases.add((double)(winHeight / 2 - amps[i]) / (double)(winHeight / 2) * Math.PI);
-            //}
-        }
-    }
-    
     /*public void interpolate(ArrayList<Double> read_amps, double T)
     {
         double[] damps = new double[winWidth];
@@ -161,6 +143,9 @@ public class PhasePaintCanvas extends JPanel {
             //amps[i] = (int)(sinc((i-T)/(double)T)*winHeight);
         }
     }*/
+    
+    // Interpolation with sample points
+    // Known problem: several times of saving and loading can cause distortion
     public void interpolate(ArrayList<Double> read_amps, double maxFreq, double f0)
     {
         double T = f0;
@@ -183,6 +168,7 @@ public class PhasePaintCanvas extends JPanel {
         }
     }
     
+    // Sinc function used by interpolation
     private double sinc(double x)
     {
         if (Math.abs(x) < 1e-16)
@@ -190,7 +176,7 @@ public class PhasePaintCanvas extends JPanel {
         return Math.sin(Math.PI * x) / (Math.PI * x);
     }
     
-    
+    // Blend features are implemented here
     public void addSet1()
     {
         for (int i = 0; i < amps.length; i++)
@@ -217,6 +203,24 @@ public class PhasePaintCanvas extends JPanel {
             recalc();
             parent.requestUpdateWaveform();
         }
+    }
+
+    // Clear the frame
+    public void clear()
+    {
+        for (int i = 0; i < winWidth; i++)
+            amps[i] = winHeight / 2;
+        repaint();
+        recalc();
+        parent.requestUpdateWaveform();
+    }
+
+    // Recalculate amplitudes of each frequencies
+    public void recalc()
+    {
+        phases.clear();
+        for (Integer i : freqs)
+            phases.add((double)(winHeight / 2 - amps[i]) / (double)(winHeight / 2) * Math.PI);
     }
     
     @Override

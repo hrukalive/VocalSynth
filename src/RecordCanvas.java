@@ -1,26 +1,27 @@
 import javax.swing.JPanel;
-import java.awt.Color;
 import javax.swing.BorderFactory;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
+import java.awt.Color;
 import java.awt.event.MouseEvent;
-//import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
-//import java.awt.event.MouseMotionListener;
-//import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 
-public class RecordCanvas extends JPanel {
+public class RecordCanvas extends JPanel
+{
     
     private int winWidth = 582;
     private int winHeight = 302;
+
     private RecordFrame parent = null;
+
     private ArrayList<Double> data;
     private double max;
     private int offset;
-    private boolean isLog = false;
+
+
     public RecordCanvas() {
         setBorder(BorderFactory.createLineBorder(Color.black));
 
@@ -30,18 +31,13 @@ public class RecordCanvas extends JPanel {
                 parent.process(e.getX(),e.getY());
             }
         });
-        
-        /*addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                parent.process(e.getX(),e.getY());
-            }
-        });*/
     }
+
     public void setParent(RecordFrame parent)
     {
         this.parent = parent;
     }
+
     public void setData(ArrayList<Double> data, double max, int offset)
     {
         this.data = data;
@@ -49,19 +45,19 @@ public class RecordCanvas extends JPanel {
         this.offset = offset;
         repaint();
     }
+
     public void setDataHalf(double[] data, double max, int offset, boolean negate)
     {
         this.data = new ArrayList<Double>();
         for (int i = 0; i < data.length / 2; i++)
         {
             this.data.add((negate?-data[i]:data[i]));
-            //System.out.println(this.data.get(i));
         }
         this.max = max;
         this.offset = offset;
-        isLog = true;
         repaint();
     }
+
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(winWidth, winHeight);
@@ -81,6 +77,5 @@ public class RecordCanvas extends JPanel {
                 g2d.draw(line);
             }
         }
-        isLog = false;
     }
 }

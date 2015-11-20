@@ -1,22 +1,20 @@
 import javax.swing.JPanel;
-import java.awt.Color;
 import javax.swing.BorderFactory;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
+import java.awt.Color;
 import java.awt.event.MouseEvent;
-//import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
-//import java.awt.event.MouseMotionListener;
-//import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 
-public class PaintCanvas extends JPanel {
+public class FreqPaintCanvas extends JPanel
+{
 
-    public final int[] amps;
+    public int[] amps;
     private ArrayList<Integer> freqs = new ArrayList<Integer>();
-    private final ArrayList<Double> amplitudes = new ArrayList<Double>();
+    private ArrayList<Double> amplitudes = new ArrayList<Double>();
     public final int winWidth = 400;
     public final int winHeight = 250;
     private int oldX = 0;
@@ -26,11 +24,10 @@ public class PaintCanvas extends JPanel {
     private final int[] amps2 = new int[winWidth];
     private boolean haveSet1 = false;
     private boolean haveSet2 = false;
-    //private WaveformCanvas wc;
-    //private PhasePaintCanvas ppc = new PhasePaintCanvas();
+
     private MainGUI parent;
 
-    public PaintCanvas() {
+    public FreqPaintCanvas() {
         setBorder(BorderFactory.createLineBorder(Color.black));
         amps = new int[winWidth];
         for (int i = 0; i < winWidth; i++)
@@ -52,12 +49,19 @@ public class PaintCanvas extends JPanel {
         });
         
     }
+
     public void setParent(MainGUI parent, ArrayList<Integer> freqs)
     {
         this.parent = parent;
         this.freqs = freqs;
     }
+
+    public ArrayList<Double> getAmplitudes()
+    {
+        return amplitudes;
+    }
     
+    // Drawing are implemented here
     private void paintPoint(int x, int y) {
         if (x < 0 && x > -10)
             x = 0;
@@ -86,6 +90,7 @@ public class PaintCanvas extends JPanel {
         }
     }
     
+    // Rescale the canvas when the range of shown freqency changes
     public void changeFreqRange(int freq)
     {
         if (freq < this.maxFreq)
@@ -123,33 +128,6 @@ public class PaintCanvas extends JPanel {
         parent.requestUpdateWaveform();
     }
     
-    public ArrayList<Double> getAmplitudes()
-    {
-        return amplitudes;
-    }
-    public void clear()
-    {
-        for (int i = 0; i < winWidth; i++)
-            amps[i] = winHeight;
-        repaint();
-        recalc();
-        parent.requestUpdateWaveform();
-    }
-    public void recalc()
-    {
-        amplitudes.clear();
-        for (Integer i : freqs)
-        {
-            //synchronized(this)
-            //{
-            if (amps[i] < winHeight)
-                amplitudes.add(Math.pow(10.0, (amps[i] / (double)winHeight * (-90.0)) / 20.0));
-            else
-                amplitudes.add(0.0);
-            //}
-        }
-    }
-    
     /*public void interpolate(ArrayList<Double> read_amps, double T)
     {
         double[] damps = new double[winWidth];
@@ -168,6 +146,9 @@ public class PaintCanvas extends JPanel {
             //amps[i] = (int)(sinc((i-T)/(double)T)*winHeight);
         }
     }*/
+
+    // Interpolation with sample points
+    // Known problem: several times of saving and loading can cause distortion
     public void interpolate(ArrayList<Double> read_amps, double maxFreq, double f0)
     {
         double T = f0;
@@ -180,14 +161,6 @@ public class PaintCanvas extends JPanel {
             {
                 damps[i] += read_amps.get(j - 1) * sinc((i - j * T) / T);
             }
-            double tempa = 0;
-            if (i / f0 > 1 && i / f0 < read_amps.size())
-            {
-                double currentI = (i / f0);
-                tempa = read_amps.get((int)currentI - 1);
-                tempa += (i - (int)(T*(currentI - 1))) / T * (read_amps.get((int)currentI) - read_amps.get((int)currentI - 1));
-            }
-            damps[i] = damps[i] * 0.4 + tempa * 0.6;
             if (damps[i]>3.1623e-5)
                 damps[i] = 20*Math.log10(damps[i]);
             else
@@ -200,6 +173,7 @@ public class PaintCanvas extends JPanel {
         }
     }
     
+    // Sinc function used by interpolation
     private double sinc(double x)
     {
         if (Math.abs(x) < 1e-16)
@@ -207,13 +181,7 @@ public class PaintCanvas extends JPanel {
         return Math.sin(Math.PI * x) / (Math.PI * x);
     }
     
-    private double quad(double x, double center, double T)
-    {
-        if (Math.abs(x - center) > T)
-            return 0;
-        return 1- 1 / (T * T) * ((x - center) * (x - center));
-    }
-    
+    // Blend features are implemented here
     public void addSet1()
     {
         for (int i = 0; i < amps.length; i++)
@@ -242,6 +210,29 @@ public class PaintCanvas extends JPanel {
         }
     }
     
+    // Clear the frame
+    public void clear()
+    {
+        for (int i = 0; i < winWidth; i++)
+            amps[i] = winHeight;
+        repaint();
+        recalc();
+        parent.requestUpdateWaveform();
+    }
+
+    // Recalculate amplitudes of each frequencies
+    public void recalc()
+    {
+        amplitudes.clear();
+        for (Integer i : freqs)
+        {
+            if (amps[i] < winHeight)
+                amplitudes.add(Math.pow(10.0, (amps[i] / (double)winHeight * (-90.0)) / 20.0));
+            else
+                amplitudes.add(0.0);
+        }
+    }
+
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(winWidth, winHeight);

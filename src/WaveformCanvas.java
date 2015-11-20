@@ -1,21 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author dsun18
- */
-
 import javax.swing.JPanel;
-import java.awt.Color;
 import javax.swing.BorderFactory;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
+import java.awt.Color;
 import java.util.ArrayList;
 
 public class WaveformCanvas extends JPanel
@@ -86,18 +75,11 @@ public class WaveformCanvas extends JPanel
             double factor = amplitudes.get(0);
             for (int i = 1; i < amplitudes.size(); i++)
             {
-                factor += amplitudes.get(i);//Math.sqrt(factor * factor + amplitudes.get(i) * amplitudes.get(i));
-                //System.out.println(amplitudes.get(i));
+                factor += amplitudes.get(i);
             }
-            //System.out.println(factor);
             for (int i = 0; i < realfreqs.size(); i++)
-            {
                 for (int j = 0; j < amps.length; j++)
-                {
-                    //System.out.println(amplitudes.get(i)+ " "+realfreqs.get(i));
                     damps[j] += (double)(winHeight / 2) / factor * amplitudes.get(i) * Math.sin(2 * Math.PI * realfreqs.get(i) * step * j + phases.get(i));
-                }
-            }
             for (int i = 0; i < winWidth; i++)
                 amps[i] = (int)Math.round(damps[i]);
             return null;
