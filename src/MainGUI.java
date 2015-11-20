@@ -33,8 +33,68 @@ public class MainGUI extends javax.swing.JFrame {
     /**
      * Creates new form MainGUI
      */
+    
+    private final int[] CHROMATIC = {
+        93,98,104,110,117,124,
+        131,139,147,156,165,175,185,196,208,220,233,247,
+        262,277,294,311,330,349,370,392,415,440,466,494,
+        523,554,587,622,659,698,740,784,831,880,932,988,
+        1047,1109,1175,1245,1319,1397,1480,1568,1661,1760,1865,1976,
+        2093,2218,2349,2489,2637,2794
+    };
+    private final int[] CHROMATIC_PATTERN = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59};
+    private final int[][][] SCALE = 
+    {
+        {
+            {3,5,7,8,10,12,14,15,17,19,20,22,24,26,27,29,31,32,34,36,38,39,41,43,44,46,48,50,51}, // A
+            {4,6,8,9,11,13,15,16,18,20,21,23,25,27,28,30,32,33,35,37,39,40,42,44,45,47,49,51,52}, // Bb
+            {5,7,9,10,12,14,16,17,19,21,22,24,26,28,29,31,33,34,36,38,40,41,43,45,46,48,50,52,53}, //B
+            {6,8,10,11,13,15,17,18,20,22,23,25,27,29,30,32,34,35,37,39,41,42,44,46,47,49,51,53,54}, //C
+            {7,9,11,12,14,16,18,19,21,23,24,26,28,30,31,33,35,36,38,40,42,43,45,47,48,50,52,54,55}, //Db
+            {8,10,12,13,15,17,19,20,22,24,25,27,29,31,32,34,36,37,39,41,43,44,46,48,49,51,53,55,56},//D
+            {9,11,13,14,16,18,20,21,23,25,26,28,30,32,33,35,37,38,40,42,44,45,47,49,50,52,54,56,57},//Eb
+            {10,12,14,15,17,19,21,22,24,26,27,29,31,33,34,36,38,39,41,43,45,46,48,50,51,53,55,57,58},//E
+            {11,13,15,16,18,20,22,23,25,27,28,30,32,34,35,37,39,40,42,44,46,47,49,51,52,54,56,58,59},//F
+            {0,2,4,5,7,9,11,12,14,16,17,19,21,23,24,26,28,29,31,33,35,36,38,40,41,43,45,47,48},     //Gb
+            {1,3,5,6,8,10,12,13,15,17,18,20,22,24,25,27,29,30,32,34,36,37,39,41,42,44,46,48,49},     //G
+            {2,4,6,7,9,11,13,14,16,18,19,21,23,25,26,28,30,31,33,35,37,38,40,42,43,45,47,49,50}      //Ab
+        },
+        {
+            {3,5,6,8,10,11,13,15,17,18,20,22,23,25,27,29,30,32,34,35,37,39,41,42,44,46,47,49,51},
+            {4,6,7,9,11,12,14,16,18,19,21,23,24,26,28,30,31,33,35,36,38,40,42,43,45,47,48,50,52},
+            {5,7,8,10,12,13,15,17,19,20,22,24,25,27,29,31,32,34,36,37,39,41,43,44,46,48,49,51,53},
+            {6,8,9,11,13,14,16,18,20,21,23,25,26,28,30,32,33,35,37,38,40,42,44,45,47,49,50,52,54},
+            {7,9,10,12,14,15,17,19,21,22,24,26,27,29,31,33,34,36,38,39,41,43,45,46,48,50,51,53,55},
+            {8,10,11,13,15,16,18,20,22,23,25,27,28,30,32,34,35,37,39,40,42,44,46,47,49,51,52,54,56},
+            {9,11,12,14,16,17,19,21,23,24,26,28,29,31,33,35,36,38,40,41,43,45,47,48,50,52,53,55,57},
+            {10,12,13,15,17,18,20,22,24,25,27,29,30,32,34,36,37,39,41,42,44,46,48,49,51,53,54,56,58},
+            {11,13,14,16,18,19,21,23,25,26,28,30,31,33,35,37,38,40,42,43,45,47,49,50,52,54,55,57,59},
+            {0,2,3,5,7,8,10,12,14,15,17,19,20,22,24,26,27,29,31,32,34,36,38,39,41,43,44,46,48},
+            {1,3,4,6,8,9,11,13,15,16,18,20,21,23,25,27,28,30,32,33,35,37,39,40,42,44,45,47,49},
+            {2,4,5,7,9,10,12,14,16,17,19,21,22,24,26,28,29,31,33,34,36,38,40,41,43,45,46,48,50}
+        },
+        {
+            {3,5,6,8,10,11,14,15,17,18,20,22,23,26,27,29,30,32,34,35,38,39,41,42,44,46,47,50,51},
+            {4,6,7,9,11,12,15,16,18,19,21,23,24,27,28,30,31,33,35,36,39,40,42,43,45,47,48,51,52},
+            {5,7,8,10,12,13,16,17,19,20,22,24,25,28,29,31,32,34,36,37,40,41,43,44,46,48,49,52,53},
+            {6,8,9,11,13,14,17,18,20,21,23,25,26,29,30,32,33,35,37,38,41,42,44,45,47,49,50,53,54},
+            {7,9,10,12,14,15,18,19,21,22,24,26,27,30,31,33,34,36,38,39,42,43,45,46,48,50,51,54,55},
+            {8,10,11,13,15,16,19,20,22,23,25,27,28,31,32,34,35,37,39,40,43,44,46,47,49,51,52,55,56},
+            {9,11,12,14,16,17,20,21,23,24,26,28,29,32,33,35,36,38,40,41,44,45,47,48,50,52,53,56,57},
+            {10,12,13,15,17,18,21,22,24,25,27,29,30,33,34,36,37,39,41,42,45,46,48,49,51,53,54,57,58},
+            {11,13,14,16,18,19,22,23,25,26,28,30,31,34,35,37,38,40,42,43,46,47,49,50,52,54,55,58,59},
+            {0,2,3,5,7,8,11,12,14,15,17,19,20,23,24,26,27,29,31,32,35,36,38,39,41,43,44,47,48},
+            {1,3,4,6,8,9,12,13,15,16,18,20,21,24,25,27,28,30,32,33,36,37,39,40,42,44,45,48,49},
+            {2,4,5,7,9,10,13,14,16,17,19,21,22,25,26,28,29,31,33,34,37,38,40,41,43,45,46,49,50}
+        }
+    };
     private ArrayList<Double> amplitudes;
     private ArrayList<Double> phases;
+    private int scaleSelected = 0;
+    private int typeSelected = 0;
+    private int keyindex = 0;
+    private int keyoffset = 0;
+    private double volume = 1.0;
     JFileChooser fc;
     public MainGUI() {
         initComponents();
@@ -60,13 +120,13 @@ public class MainGUI extends javax.swing.JFrame {
         freqPaintCanvas = new PaintCanvas();
         slider_freq = new javax.swing.JSlider();
         txt_maxFreq = new javax.swing.JTextField();
+        btn_addSet1 = new javax.swing.JButton();
+        btn_addSet2 = new javax.swing.JButton();
         btn_freqClear = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        btn_addSet1 = new javax.swing.JButton();
-        btn_addSet2 = new javax.swing.JButton();
         phasePanel = new javax.swing.JPanel();
         phasePaintCanvas = new PhasePaintCanvas();
         btn_phaseClear = new javax.swing.JButton();
@@ -74,18 +134,26 @@ public class MainGUI extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         waveformCanvas = new WaveformCanvas();
-        btn_play = new javax.swing.JToggleButton();
         tab_freqchooser = new javax.swing.JTabbedPane();
         freeFreqChooser = new javax.swing.JPanel();
         slider_voiceFreq = new javax.swing.JSlider();
         jLabel5 = new javax.swing.JLabel();
         txt_voiceFreq = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
+        scaleFreqChooser = new javax.swing.JPanel();
+        combo_scale = new javax.swing.JComboBox<>();
+        combo_type = new javax.swing.JComboBox<>();
+        slider_key = new javax.swing.JSlider();
+        label_freq = new javax.swing.JLabel();
+        txt_offset = new javax.swing.JTextField();
         btn_load = new javax.swing.JButton();
         btn_save = new javax.swing.JButton();
-        slider_blend = new javax.swing.JSlider();
         btn_record = new javax.swing.JButton();
+        btn_play = new javax.swing.JToggleButton();
+        slider_volume = new javax.swing.JSlider();
+        slider_blend = new javax.swing.JSlider();
         jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(244, 244, 244));
@@ -122,6 +190,20 @@ public class MainGUI extends javax.swing.JFrame {
             }
         });
 
+        btn_addSet1.setText("1st");
+        btn_addSet1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_addSet1ActionPerformed(evt);
+            }
+        });
+
+        btn_addSet2.setText("2nd");
+        btn_addSet2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_addSet2ActionPerformed(evt);
+            }
+        });
+
         btn_freqClear.setText("Clear");
         btn_freqClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -136,20 +218,6 @@ public class MainGUI extends javax.swing.JFrame {
         jLabel3.setText("0dB");
 
         jLabel4.setText("-90dB");
-
-        btn_addSet1.setText("1st");
-        btn_addSet1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_addSet1ActionPerformed(evt);
-            }
-        });
-
-        btn_addSet2.setText("2nd");
-        btn_addSet2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_addSet2ActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout freqPanelLayout = new javax.swing.GroupLayout(freqPanel);
         freqPanel.setLayout(freqPanelLayout);
@@ -285,13 +353,6 @@ public class MainGUI extends javax.swing.JFrame {
             .addGap(0, 112, Short.MAX_VALUE)
         );
 
-        btn_play.setText("Play");
-        btn_play.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_playActionPerformed(evt);
-            }
-        });
-
         slider_voiceFreq.setMaximum(1320);
         slider_voiceFreq.setMinimum(110);
         slider_voiceFreq.setValue(220);
@@ -319,7 +380,7 @@ public class MainGUI extends javax.swing.JFrame {
             .addGroup(freeFreqChooserLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(freeFreqChooserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(slider_voiceFreq, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
+                    .addComponent(slider_voiceFreq, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
                     .addGroup(freeFreqChooserLayout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addComponent(jLabel5)
@@ -345,6 +406,75 @@ public class MainGUI extends javax.swing.JFrame {
 
         tab_freqchooser.addTab("Freqency", freeFreqChooser);
 
+        combo_scale.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "Chromatic" }));
+        combo_scale.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                combo_scaleActionPerformed(evt);
+            }
+        });
+
+        combo_type.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Major", "Natural Minor", "Harmonic Minor" }));
+        combo_type.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                combo_typeActionPerformed(evt);
+            }
+        });
+
+        slider_key.setMajorTickSpacing(3);
+        slider_key.setMaximum(10);
+        slider_key.setMinorTickSpacing(1);
+        slider_key.setValue(0);
+        slider_key.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                slider_keyStateChanged(evt);
+            }
+        });
+
+        label_freq.setText("220Hz");
+
+        txt_offset.setText("0");
+        txt_offset.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_offsetKeyPressed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout scaleFreqChooserLayout = new javax.swing.GroupLayout(scaleFreqChooser);
+        scaleFreqChooser.setLayout(scaleFreqChooserLayout);
+        scaleFreqChooserLayout.setHorizontalGroup(
+            scaleFreqChooserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(scaleFreqChooserLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(scaleFreqChooserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(scaleFreqChooserLayout.createSequentialGroup()
+                        .addComponent(slider_key, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(label_freq))
+                    .addGroup(scaleFreqChooserLayout.createSequentialGroup()
+                        .addComponent(combo_scale, 0, 77, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(combo_type, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_offset, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        scaleFreqChooserLayout.setVerticalGroup(
+            scaleFreqChooserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(scaleFreqChooserLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(scaleFreqChooserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(combo_scale, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(combo_type, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_offset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(8, 8, 8)
+                .addGroup(scaleFreqChooserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(slider_key, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(label_freq, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        tab_freqchooser.addTab("Scale", scaleFreqChooser);
+
         btn_load.setText("Load Preset");
         btn_load.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -359,13 +489,6 @@ public class MainGUI extends javax.swing.JFrame {
             }
         });
 
-        slider_blend.setValue(0);
-        slider_blend.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                slider_blendStateChanged(evt);
-            }
-        });
-
         btn_record.setText("Record and Analyze");
         btn_record.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -373,7 +496,30 @@ public class MainGUI extends javax.swing.JFrame {
             }
         });
 
+        btn_play.setText("Play");
+        btn_play.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_playActionPerformed(evt);
+            }
+        });
+
+        slider_volume.setValue(100);
+        slider_volume.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                slider_volumeStateChanged(evt);
+            }
+        });
+
+        slider_blend.setValue(0);
+        slider_blend.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                slider_blendStateChanged(evt);
+            }
+        });
+
         jLabel10.setText("Blend: ");
+
+        jLabel11.setText("Volume:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -385,18 +531,22 @@ public class MainGUI extends javax.swing.JFrame {
                     .addComponent(waveformCanvas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tab_freqchooser)
                     .addComponent(btn_play, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btn_load, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(btn_record, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btn_save, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(6, 6, 6)
-                        .addComponent(jLabel10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel10)
+                            .addComponent(jLabel11))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(slider_blend, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btn_load, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(btn_record, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(slider_volume, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addComponent(slider_blend, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(phasePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -416,9 +566,13 @@ public class MainGUI extends javax.swing.JFrame {
                             .addComponent(btn_save))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_record)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(26, 26, 26)
                         .addComponent(tab_freqchooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(29, 29, 29)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(slider_volume, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(slider_blend, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -622,7 +776,67 @@ public class MainGUI extends javax.swing.JFrame {
         phasePaintCanvas.recalc();
         requestUpdateWaveform();
     }//GEN-LAST:event_btn_phaseClearActionPerformed
-    
+
+    private void combo_scaleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_combo_scaleActionPerformed
+        scaleSelected = combo_scale.getSelectedIndex();
+        slider_key.setValue(0);
+        if (scaleSelected == 12)
+        {
+            slider_key.setMaximum(15);
+            combo_type.setEnabled(false);
+        }
+        else
+        {
+            slider_key.setMaximum(10);
+            combo_type.setEnabled(true);
+        }
+        applyScale();
+    }//GEN-LAST:event_combo_scaleActionPerformed
+
+    private void combo_typeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_combo_typeActionPerformed
+        typeSelected = combo_type.getSelectedIndex();
+        slider_key.setValue(0);
+        applyScale();
+    }//GEN-LAST:event_combo_typeActionPerformed
+
+    private void slider_keyStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_slider_keyStateChanged
+        keyindex = slider_key.getValue();
+        applyScale();
+    }//GEN-LAST:event_slider_keyStateChanged
+
+    private void txt_offsetKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_offsetKeyPressed
+        if (evt.getKeyCode() == 10)
+        {
+            try
+            {
+                keyoffset = Integer.parseInt(txt_offset.getText());
+                applyScale();
+            }
+            catch(Exception e)
+            {
+            }
+        }
+    }//GEN-LAST:event_txt_offsetKeyPressed
+
+    private void slider_volumeStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_slider_volumeStateChanged
+        volume = slider_volume.getValue() / 100.0;
+    }//GEN-LAST:event_slider_volumeStateChanged
+    private void applyScale()
+    {
+        int realIndex = 0;
+        if (scaleSelected == 12)
+            realIndex = CHROMATIC_PATTERN[keyindex];
+        else
+            realIndex = SCALE[typeSelected][scaleSelected][keyindex];
+        realIndex += keyoffset;
+        if (realIndex >= 0 && realIndex < CHROMATIC.length)
+        {
+            txt_voiceFreq.setText("" + CHROMATIC[realIndex]);
+            slider_voiceFreq.setValue((int)Double.parseDouble(txt_voiceFreq.getText()));
+            label_freq.setText(CHROMATIC[realIndex] + "Hz");
+            generateFreqLine(Double.parseDouble(txt_voiceFreq.getText()), Integer.parseInt(txt_maxFreq.getText()));
+        }
+    }
     public void requestUpdateWaveform()
     {
         waveformCanvas.drawWaveform(realfreqs, amplitudes, phases);
@@ -773,7 +987,7 @@ public class MainGUI extends javax.swing.JFrame {
                                 continue;
                             dSampleVal += 1.0 / factor * temp * Math.sin(2 * Math.PI * j * fCyclePosition + getPhase(j * fFreq, maxFreq));
                         }
-                        cBuf.putShort((short) (Short.MAX_VALUE * 0.5 * dSampleVal));
+                        cBuf.putShort((short) (Short.MAX_VALUE * volume * dSampleVal));
 
                         fCyclePosition += fCycleInc;
                         if (fCyclePosition > 1) {
@@ -827,11 +1041,14 @@ public class MainGUI extends javax.swing.JFrame {
     private javax.swing.JToggleButton btn_play;
     private javax.swing.JButton btn_record;
     private javax.swing.JButton btn_save;
+    private javax.swing.JComboBox<String> combo_scale;
+    private javax.swing.JComboBox<String> combo_type;
     private javax.swing.JPanel freeFreqChooser;
     private PaintCanvas freqPaintCanvas;
     private javax.swing.JPanel freqPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -840,13 +1057,18 @@ public class MainGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel label_freq;
     private PhasePaintCanvas phasePaintCanvas;
     private javax.swing.JPanel phasePanel;
+    private javax.swing.JPanel scaleFreqChooser;
     private javax.swing.JSlider slider_blend;
     private javax.swing.JSlider slider_freq;
+    private javax.swing.JSlider slider_key;
     private javax.swing.JSlider slider_voiceFreq;
+    private javax.swing.JSlider slider_volume;
     private javax.swing.JTabbedPane tab_freqchooser;
     private javax.swing.JTextField txt_maxFreq;
+    private javax.swing.JTextField txt_offset;
     private javax.swing.JTextField txt_voiceFreq;
     private WaveformCanvas waveformCanvas;
     // End of variables declaration//GEN-END:variables

@@ -360,7 +360,7 @@ public class RecordFrame extends javax.swing.JFrame {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException ex) {
-                    System.out.println("Interuppted, exit");
+                    System.out.println("Update thread is interuppted, exit");
                     bExitFlag = true;
                 }
                 if (out != null)
@@ -414,7 +414,7 @@ public class RecordFrame extends javax.swing.JFrame {
             while (!bExitThread) {
                // Read the next chunk of data from the TargetDataLine.
                numBytesRead =  line.read(data, 0, data.length);
-               // System.out.println("numBytesRead");
+               System.out.println("Read " + numBytesRead + " bytes");
                // Save this chunk of data.
                out.write(data, 0, numBytesRead);
             }

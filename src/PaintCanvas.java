@@ -180,6 +180,14 @@ public class PaintCanvas extends JPanel {
             {
                 damps[i] += read_amps.get(j - 1) * sinc((i - j * T) / T);
             }
+            double tempa = 0;
+            if (i / f0 > 1 && i / f0 < read_amps.size())
+            {
+                double currentI = (i / f0);
+                tempa = read_amps.get((int)currentI - 1);
+                tempa += (i - (int)(T*(currentI - 1))) / T * (read_amps.get((int)currentI) - read_amps.get((int)currentI - 1));
+            }
+            damps[i] = damps[i] * 0.4 + tempa * 0.6;
             if (damps[i]>3.1623e-5)
                 damps[i] = 20*Math.log10(damps[i]);
             else
